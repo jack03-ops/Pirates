@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Master Class Hub - Zero-to-Hero Interview Practice</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="logo-container">
+        <div class="logo-icon">SQL</div>
+        <div class="logo-text">
+          <h1>Master Class</h1>
+          <span>Data Engineering Prep</span>
+        </div>
+      </div>
+      
+      <nav class="nav-menu">
+        <div class="nav-section-title">Curriculum Modules</div>
+        
+        <a href="#" class="nav-item active" data-panel="setup" id="nav-setup">
+          <span class="nav-item-title">1. Setup & Environment</span>
+          <span class="nav-item-badge">0/10</span>
+        </a>
+        
+        <a href="#" class="nav-item" data-panel="fundamentals" id="nav-fundamentals">
+          <span class="nav-item-title">2. Fundamentals & ACID</span>
+          <span class="nav-item-badge">0/15</span>
+        </a>
+        
+        <a href="#" class="nav-item" data-panel="keys" id="nav-keys">
+          <span class="nav-item-title">3. Keys & Normalization</span>
+          <span class="nav-item-badge">0/10</span>
+        </a>
+        
+        <a href="#" class="nav-item" data-panel="querying" id="nav-querying">
+          <span class="nav-item-title">4. Querying & Filtering</span>
+          <span class="nav-item-badge">0/15</span>
+        </a>
+        
+        <a href="#" class="nav-item" data-panel="manipulation" id="nav-manipulation">
+          <span class="nav-item-title">5. Advanced Manipulation</span>
+          <span class="nav-item-badge">0/10</span>
+        </a>
+        
+        <a href="#" class="nav-item" data-panel="relational" id="nav-relational">
+          <span class="nav-item-title">6. Relational & Windows</span>
+          <span class="nav-item-badge">0/15</span>
+        </a>
+        
+        <a href="#" class="nav-item" data-panel="performance" id="nav-performance">
+          <span class="nav-item-title">7. Optimization & Admin</span>
+          <span class="nav-item-badge">0/15</span>
+        </a>
+        
+        <a href="#" class="nav-item" data-panel="applications" id="nav-applications">
+          <span class="nav-item-title">8. DE Applications & SCD</span>
+          <span class="nav-item-badge">0/10</span>
+        </a>
+        
+        <div class="nav-section-title">Case Studies</div>
+        <a href="#" class="nav-item" data-panel="star-project" id="nav-star-project">
+          <span class="nav-item-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px; vertical-align:middle;"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            STAR Data Pipeline
+          </span>
+        </a>
+        
+        <div class="nav-section-title">Assessments</div>
+        <a href="#" class="nav-item" data-panel="exam-simulator" id="nav-exam-simulator">
+          <span class="nav-item-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px; vertical-align:middle;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            Mock Simulator Exam
+          </span>
+        </a>
+      </nav>
+      
+      <!-- Footer details -->
+      <div class="sidebar-footer">
+        <div class="user-badge">
+          <div class="user-avatar">DE</div>
+          <div class="user-details">
+            <span class="user-name">Candidate Profile</span>
+            <span class="user-role">3-6 Yrs • SQL & Playwright</span>
+          </div>
+        </div>
+        <div>Target Location: Chennai/Bangalore</div>
+      </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Dashboard Header with Global Progress -->
+      <header class="dashboard-header">
+        <div class="dashboard-title">
+          <h2>SQL Master Class Hub</h2>
+          <p>Structured Interview Study Guide & Practice Arena</p>
+        </div>
+        
+        <div class="stats-container">
+          <div class="stat-box">
+            <div class="stat-icon">🎓</div>
+            <div>
+              <div class="stat-val" id="stat-mastery-val">0 / 100</div>
+              <div class="stat-lbl">Mastered Cards</div>
+            </div>
+          </div>
+          
+          <div class="stat-box">
+            <div class="stat-icon">📈</div>
+            <div>
+              <div class="stat-val" id="stat-score-val">0.0 / 10</div>
+              <div class="stat-lbl">Latest Simulator Score</div>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Module Mastery Overview Grid (Progress Bars) -->
+      <section class="module-progress-grid" id="module-progress-container"></section>
+      
+      <!-- Real-Time Content Filter Search Bar -->
+      <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Search key SQL terms, definitions, scenarios, or keywords...">
+        <svg class="search-icon-svg" viewBox="0 0 24 24">
+          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+      </div>
+      
+      <!-- Application Panels (SPA Router Targets) -->
+      <section class="panel active" id="panel-setup" aria-label="Setup & Environment Panel"></section>
+      <section class="panel" id="panel-fundamentals" aria-label="Fundamentals Panel"></section>
+      <section class="panel" id="panel-keys" aria-label="Keys & Normalization Panel"></section>
+      <section class="panel" id="panel-querying" aria-label="Basic Querying Panel"></section>
+      <section class="panel" id="panel-manipulation" aria-label="Advanced Manipulation Panel"></section>
+      <section class="panel" id="panel-relational" aria-label="Relational Queries Panel"></section>
+      <section class="panel" id="panel-performance" aria-label="Performance Panel"></section>
+      <section class="panel" id="panel-applications" aria-label="Data Engineering Applications Panel"></section>
+      <section class="panel" id="panel-star-project" aria-label="STAR Project Case Study Panel"></section>
+      <section class="panel" id="panel-exam-simulator" aria-label="Mock Exam Simulator Panel"></section>
+      
+    </main>
+    
+  </div>
+
+  <!-- Load script resources -->
+  <script src="data.js"></script>
+  <script src="simulator.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
