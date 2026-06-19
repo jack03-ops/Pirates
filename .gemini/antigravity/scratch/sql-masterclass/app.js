@@ -162,39 +162,193 @@ function filterContent(query) {
   });
 }
 
+// Helper: child analogies and hands-on query challenges generator
+function getChildFriendlyAndHandsOn(qObj, category) {
+  const qText = qObj.q.toLowerCase();
+  
+  let childFriendly = "";
+  let handsOn = "";
+  let handsOnCode = "";
+  
+  if ((qText.includes("mysql") && qText.includes("running")) || qText.includes("linux")) {
+    childFriendly = "Imagine MySQL is a giant talking toy box. Running the server is like plugging it into the wall. If you don't turn it on, the toy box stays asleep and won't answer your questions! The systemctl command is like pressing the ON button on the back of the box.";
+    handsOn = "Log in to your Linux terminal and query the system to see if the MySQL server is awake and active.";
+    handsOnCode = "sudo systemctl status mysql";
+  }
+  else if (qText.includes("port") && qText.includes("3306")) {
+    childFriendly = "Think of ports like mailboxes at an apartment building. Mailbox 3306 is reserved only for Mr. MySQL's letters! If another toy tries to use mailbox 3306, there will be a fight and nobody can receive mail.";
+    handsOn = "Scan the network ports to verify that port 3306 is open and listening for database requests.";
+    handsOnCode = "sudo netstat -plntu | grep 3306";
+  }
+  else if (qText.includes("sql") && qText.includes("mysql")) {
+    childFriendly = "SQL is like the English language (rules of grammar). MySQL is like a specific person who speaks English (the database engine). You use the language (SQL) to tell the person (MySQL) to fetch a toy for you.";
+    handsOn = "Log in using the SQL command line tool and list all available databases.";
+    handsOnCode = "mysql -u root -p -e 'SHOW DATABASES;'";
+  }
+  else if (qText.includes("truncate") && qText.includes("delete")) {
+    childFriendly = "Imagine a crayon drawer. DELETE is like taking out the broken red crayons one-by-one with an eraser. TRUNCATE is like pulling the drawer out, dumping all crayons into the bin in one second, but keeping the empty drawer! DROP is like throwing the whole drawer and the desk into the trash bin!";
+    handsOn = "Create a temporary table, add a row, and empty it instantly with TRUNCATE.";
+    handsOnCode = "CREATE TEMPORARY TABLE temp_crayons (id INT, color VARCHAR(10));\nINSERT INTO temp_crayons VALUES (1, 'Red');\nTRUNCATE TABLE temp_crayons;";
+  }
+  else if (qText.includes("acid")) {
+    childFriendly = "ACID is the ultimate pinky-promise of database transactions! Atomicity means all-or-nothing (if you pay for candy, you must get the candy, otherwise you get your coin back). Consistency means no cheating the rules. Isolation means you color your picture in peace without someone grabbing your crayons. Durability means your drawing is saved in ink so it never gets erased, even if the lights go out!";
+    handsOn = "Start a transaction, update a balance, and complete it using COMMIT to guarantee durability.";
+    handsOnCode = "START TRANSACTION;\nUPDATE accounts SET balance = balance - 10 WHERE user_id = 1;\nUPDATE accounts SET balance = balance + 10 WHERE user_id = 2;\nCOMMIT;";
+  }
+  else if (qText.includes("isolation")) {
+    childFriendly = "Think of transaction isolation like studying in private rooms. Read Uncommitted is like leaving the door open—anyone can peek at your draft drawings. Read Committed is closing the door so people only see finished drawings. Repeatable Read is locking the door so nobody can change what's inside your room. Serializable is putting a guard at the door so only one person can enter at a time!";
+    handsOn = "Set the session isolation level to Repeatable Read to prevent dirty reads.";
+    handsOnCode = "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;\nSELECT @@transaction_isolation;";
+  }
+  else if (qText.includes("primary key") && qText.includes("unique")) {
+    childFriendly = "A Primary Key is like your unique passport number—you can only have one, and you cannot have a blank passport. A Unique Key is like your personal email address—every email is unique, but some students might not have an email address yet (which is NULL!).";
+    handsOn = "Create a table using both a PRIMARY KEY and a UNIQUE constraint.";
+    handsOnCode = "CREATE TABLE users (\n  user_id INT PRIMARY KEY,\n  passport_no VARCHAR(20) UNIQUE\n);";
+  }
+  else if (qText.includes("foreign key")) {
+    childFriendly = "A Foreign Key is like a wristband that connects you to your parent at the zoo. You cannot have a kid wristband pointing to a parent who doesn't exist! It ensures kids are always linked to valid parents.";
+    handsOn = "Create a child table linked to a parent table using a FOREIGN KEY.";
+    handsOnCode = "CREATE TABLE orders (\n  order_id INT PRIMARY KEY,\n  customer_id INT,\n  FOREIGN KEY (customer_id) REFERENCES customers(user_id)\n);";
+  }
+  else if (qText.includes("normalization") || qText.includes("1nf") || qText.includes("2nf") || qText.includes("3nf")) {
+    childFriendly = "Normalization is like organizing your messy room. 1NF says: 'No boxes filled with mixed toys; keep items atomic!' 2NF says: 'Label every box clearly with its purpose.' 3NF says: 'Do not put a toy label on a shelf that belongs to a separate table; keep things dependent only on the main key!'";
+    handsOn = "Design a normalized database schema by splitting devices and buildings to avoid repeating data.";
+    handsOnCode = "CREATE TABLE buildings (id INT PRIMARY KEY, name VARCHAR(50));\nCREATE TABLE devices (\n  id INT PRIMARY KEY,\n  name VARCHAR(50),\n  building_id INT,\n  FOREIGN KEY (building_id) REFERENCES buildings(id)\n);";
+  }
+  else if (qText.includes("execution order") || qText.includes("select statement")) {
+    childFriendly = "SQL execution order is like baking a cake. You must gather ingredients from the pantry first (FROM), sift out bad ingredients (WHERE), mix them (GROUP BY), verify the mix looks right (HAVING), cut the slices (SELECT), decorate them (ORDER BY), and limit yourself to eating just 1 slice (LIMIT)! Even though SELECT is written first, it is evaluated near the end!";
+    handsOn = "Query device counts grouped by category, showing execution clauses order.";
+    handsOnCode = "SELECT category, COUNT(*)\nFROM smart_devices\nWHERE status = 'ACTIVE'\nGROUP BY category\nHAVING COUNT(*) > 2\nORDER BY category DESC\nLIMIT 5;";
+  }
+  else if (qText.includes("where") && qText.includes("having")) {
+    childFriendly = "WHERE filters individual apples (like throwing away rotten apples before making a pie). HAVING filters bags of apples (like rejecting whole bags that have fewer than 10 apples after you group them).";
+    handsOn = "Write a query utilizing both WHERE to filter rows and HAVING to filter aggregated groups.";
+    handsOnCode = "SELECT room_id, AVG(temp) \nFROM thermostat_logs \nWHERE logged_date > '2026-06-01' \nGROUP BY room_id \nHAVING AVG(temp) > 24.0;";
+  }
+  else if (qText.includes("coalesce")) {
+    childFriendly = "COALESCE is like a backup plan for dinner. You check if there is pizza. If no pizza (NULL), you check if there is burger. If no burger (NULL), you default to cereal! It scans the options and grabs the first food that is actually there.";
+    handsOn = "Query user email contacts, falling back to phone number if email is NULL.";
+    handsOnCode = "SELECT name, COALESCE(email, phone, 'No Contact Info') AS primary_contact\nFROM contacts;";
+  }
+  else if (qText.includes("case when")) {
+    childFriendly = "CASE WHEN is like a sorting hat. If your grade is above 90, you get an 'A' sticker. If it's above 80, you get a 'B' sticker. Else, you get a 'Try Harder' stamp. It checks your numbers and prints the right label!";
+    handsOn = "Categorize device temperature readings into 'Hot', 'Cold', or 'Comfortable'.";
+    handsOnCode = "SELECT sensor_id, temp,\n  CASE \n    WHEN temp > 26 THEN 'HOT'\n    WHEN temp < 18 THEN 'COLD'\n    ELSE 'COMFORTABLE'\n  END AS comfort_status\nFROM temperature_feed;";
+  }
+  else if (qText.includes("join") && (qText.includes("left") || qText.includes("inner") || qText.includes("right"))) {
+    childFriendly = "An INNER JOIN is like matching puzzle pieces: only kids with matching buddy shoes get to play. A LEFT JOIN is like letting all kids stay, but if they don't have a buddy shoe, we just write 'empty' (NULL) next to their name!";
+    handsOn = "Execute a left join linking devices with location coordinates.";
+    handsOnCode = "SELECT d.device_name, l.coordinates\nFROM devices d\nLEFT JOIN locations l ON d.location_id = l.id;";
+  }
+  else if (qText.includes("window function") || qText.includes("row_number") || qText.includes("rank")) {
+    childFriendly = "A Window Function is like having a private referee count things just for your group. Normal GROUP BY squashes 10 kids into 1 single pile. Window functions keep all 10 kids standing in line, but writes their group rank (1st, 2nd, 3rd) right on their shirts using the OVER clause!";
+    handsOn = "Rank device alerts chronologically per device using DENSE_RANK().";
+    handsOnCode = "SELECT alert_id, device_id, logged_at,\n  DENSE_RANK() OVER (PARTITION BY device_id ORDER BY logged_at DESC) as alert_rank\nFROM system_alerts;";
+  }
+  else if (qText.includes("lead") || qText.includes("lag")) {
+    childFriendly = "LAG is like looking at the kid standing right behind you in line to see what toy they have. LEAD is looking at the kid in front of you. This helps you compare your current temperature reading with the previous hour's reading to see if it's getting hotter!";
+    handsOn = "Calculate the temperature difference between consecutive readings using LAG.";
+    handsOnCode = "SELECT timestamp, temp,\n  temp - LAG(temp, 1) OVER (ORDER BY timestamp) AS temp_change\nFROM sensor_feed;";
+  }
+  else if (qText.includes("index") && (qText.includes("clustered") || qText.includes("non-clustered") || qText.includes("speed"))) {
+    childFriendly = "Imagine a massive dictionary. A Clustered Index is the dictionary itself, sorted alphabetically from A to Z. A Non-Clustered Index is the index pages at the back—it lists special words and says: 'Go look at Page 45, Column 2' to find them!";
+    handsOn = "Create a non-clustered composite index on building columns to speed up searches.";
+    handsOnCode = "CREATE INDEX idx_device_building_status ON smart_devices (building_id, status);";
+  }
+  else if (qText.includes("explain")) {
+    childFriendly = "EXPLAIN is like asking your teacher: 'Can you show me the exact map of steps you will take to solve this math problem?' before you write down the answer. It shows if the database engine will scan the whole library or just look at the index book!";
+    handsOn = "Inspect the execution path of a database query using EXPLAIN.";
+    handsOnCode = "EXPLAIN SELECT * FROM telemetry_records WHERE building_id = 5;";
+  }
+  else if (qText.includes("scd") || qText.includes("slowly changing")) {
+    childFriendly = "Imagine you move to a new room. SCD Type 1 is erasing 'Room 101' and writing 'Room 202' (no history!). SCD Type 2 is keeping the photo of you in Room 101, taking a new photo of you in Room 202, and writing the dates on both photos so you see your full moving history!";
+    handsOn = "Insert a new location record for a sensor while updating the old location bounds (SCD Type 2).";
+    handsOnCode = "UPDATE dim_devices SET end_date = NOW(), is_current = FALSE WHERE device_id = 5 AND is_current = TRUE;\nINSERT INTO dim_devices (device_id, location, start_date, is_current) VALUES (5, 'Room 202', NOW(), TRUE);";
+  }
+  else {
+    if (category === "setup") {
+      childFriendly = "Think of this setup as organizing your workspace. We configure database connections like connecting phone lines so our applications can talk to each other without error.";
+      handsOn = "Create a schema/database namespace to organize your tables.";
+      handsOnCode = "CREATE DATABASE IF NOT EXISTS smart_buildings_db;";
+    } else if (category === "fundamentals") {
+      childFriendly = "This is the alphabet of database tables. You write instructions (DDL) to build shelves, and commands (DML) to add or edit the boxes sitting on those shelves.";
+      handsOn = "Rename a column or alter its data type using ALTER TABLE.";
+      handsOnCode = "ALTER TABLE smart_devices MODIFY COLUMN status VARCHAR(20);";
+    } else if (category === "keys") {
+      childFriendly = "These constraints are boundaries for data. They are like safety fences around a playground to make sure data entries don't wander off or get mixed up.";
+      handsOn = "Add a constraint to make sure room temperature is never below 0 degrees.";
+      handsOnCode = "ALTER TABLE room_telemetry ADD CONSTRAINT chk_temp CHECK (temp >= 0);";
+    } else if (category === "querying") {
+      childFriendly = "This is like selecting specific crayons from a coloring box. You ask for specific colors (columns), filter out broken crayons (WHERE), and count them by pile.";
+      handsOn = "Count the total number of logs recorded, ignoring NULL rows.";
+      handsOnCode = "SELECT COUNT(sensor_id) FROM sensor_logs;";
+    } else if (category === "manipulation") {
+      childFriendly = "This is playing with letters and numbers. It lets you format dates, stitch texts together, or clean up spacing to keep data readable.";
+      handsOn = "Concatenate building name and device status with a hyphen separator.";
+      handsOnCode = "SELECT CONCAT_WS(' - ', building_name, status) AS status_label FROM buildings;";
+    } else if (category === "relational") {
+      childFriendly = "This links different tables together. It's like pairing students with their books using names, or ranking runners by score partitions.";
+      handsOn = "Create a virtual view of your reports to simplify complex joins.";
+      handsOnCode = "CREATE VIEW view_active_alerts AS\nSELECT d.name, a.message\nFROM devices d\nJOIN alerts a ON d.id = a.device_id\nWHERE a.resolved = FALSE;";
+    } else if (category === "performance") {
+      childFriendly = "This is how we make things go fast! We create special paths and lookup booklets so we don't scan all shelves one-by-one.";
+      handsOn = "Delete a duplicate or unneeded index to speed up write updates.";
+      handsOnCode = "ALTER TABLE telemetry_records DROP INDEX idx_old_telemetry;";
+    } else {
+      childFriendly = "This is data warehousing. It's like storing old journals in archive boxes so that we can compare historical entries accurately.";
+      handsOn = "Fetch records in Python using database cursors to process row-by-row.";
+      handsOnCode = "# Python Cursor loop example:\n# cursor.execute('SELECT * FROM dim_devices')\n# for row in cursor.fetchall(): print(row)";
+    }
+  }
+  
+  return { childFriendly, handsOn, handsOnCode };
+}
+
 // Helper: fallback generator to build 7-part cards dynamically from simulator data
 function getStudyCardForQuestion(qObj, category) {
   // Check if we have a detailed hand-written one in INTERVIEW_PREP_DATA
   const detailedList = INTERVIEW_PREP_DATA[category] || [];
   const detailed = detailedList.find(c => c.id === qObj.id || c.title.toLowerCase().includes(qObj.q.toLowerCase().slice(0, 15)));
-  if (detailed) return detailed;
-
-  // Formatting SQL keywords for syntax highlight/snippet
-  let cleanSnippet = "";
-  if (qObj.answer.toLowerCase().includes("select") || qObj.answer.toLowerCase().includes("create") || qObj.answer.toLowerCase().includes("alter") || qObj.answer.toLowerCase().includes("delete")) {
-    // Attempt to extract sql statements inside answer, or default to general syntax
-    const match = qObj.answer.match(/`([^`]+)`/);
-    cleanSnippet = match ? match[1] : `-- SQL Statement:\n${qObj.answer}`;
+  
+  let cardData = {};
+  
+  if (detailed) {
+    cardData = { ...detailed };
   } else {
-    cleanSnippet = `-- Explanation:\n-- ${qObj.answer.split('.').slice(0, 2).join('.')}`;
+    // Formatting SQL keywords for syntax highlight/snippet
+    let cleanSnippet = "";
+    if (qObj.answer.toLowerCase().includes("select") || qObj.answer.toLowerCase().includes("create") || qObj.answer.toLowerCase().includes("alter") || qObj.answer.toLowerCase().includes("delete")) {
+      // Attempt to extract sql statements inside answer, or default to general syntax
+      const match = qObj.answer.match(/`([^`]+)`/);
+      cleanSnippet = match ? match[1] : `-- SQL Statement:\n${qObj.answer}`;
+    } else {
+      cleanSnippet = `-- Explanation:\n-- ${qObj.answer.split('.').slice(0, 2).join('.')}`;
+    }
+
+    cardData = {
+      id: qObj.id,
+      title: qObj.q,
+      easyDefinition: `Essential SQL interview concept focusing on: "${qObj.q}". It defines fundamental behaviors, syntax, or constraints within query operations.`,
+      projectExample: `In our Smart Buildings monitoring systems, we use this database operation to structure API telemetry feeds and manage client reports efficiently.`,
+      productionScenario: `Neglecting this constraint or syntax in high-concurrency environments leads to query locking, slow table scans, or incorrect reporting data.`,
+      validations: `Verify code structures in query analyzers like DBeaver. Review SQL outputs, test null boundaries, and inspect query plan properties.`,
+      interviewAnswer: qObj.answer,
+      followUp: `What are the performance implications of this command under heavy database write/read ratios?`,
+      mistakes: `Using wrong operators, forgetting index keys, or neglecting transaction limits.`,
+      codeSnippet: cleanSnippet
+    };
   }
 
-  // Fallback 7-part card
-  return {
-    id: qObj.id,
-    title: qObj.q,
-    easyDefinition: `Essential SQL interview concept focusing on: "${qObj.q}". It defines fundamental behaviors, syntax, or constraints within query operations.`,
-    projectExample: `In our Smart Buildings monitoring systems, we use this database operation to structure API telemetry feeds and manage client reports efficiently.`,
-    productionScenario: `Neglecting this constraint or syntax in high-concurrency environments leads to query locking, slow table scans, or incorrect reporting data.`,
-    validations: `Verify code structures in query analyzers like DBeaver. Review SQL outputs, test null boundaries, and inspect query plan properties.`,
-    interviewAnswer: qObj.answer,
-    followUp: `What are the performance implications of this command under heavy database write/read ratios?`,
-    mistakes: `Using wrong operators, forgetting index keys, or neglecting transaction limits.`,
-    codeSnippet: cleanSnippet
-  };
+  // Inject child analogy and hands-on query challenge dynamically
+  const extra = getChildFriendlyAndHandsOn(qObj, category);
+  cardData.childFriendly = cardData.childFriendly || extra.childFriendly;
+  cardData.handsOn = cardData.handsOn || extra.handsOn;
+  cardData.handsOnCode = cardData.handsOnCode || extra.handsOnCode;
+
+  return cardData;
 }
 
-// Render the 7-Part Study Cards inside a module
+// Render the Study Cards inside a module
 function renderModuleStudyCards(category) {
   const panel = document.getElementById(`panel-${category}`);
   if (!panel) return;
@@ -280,6 +434,16 @@ function renderModuleStudyCards(category) {
           </div>
         </div>
         
+        <!-- Child Analogy section -->
+        <div class="study-sec child-analogy-sec" style="margin-top: 1.5rem; margin-bottom: 1.5rem; background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.15);">
+          <div class="study-sec-title" style="color: #a855f7;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right:4px; vertical-align:middle;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            Child-Friendly Explanation & Analogy 🧸
+          </div>
+          <div class="study-sec-content">${cardData.childFriendly}</div>
+        </div>
+
+        <!-- Mistakes section -->
         <div class="study-sec sec-mistakes" style="margin-bottom: 1.5rem;">
           <div class="study-sec-title">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
@@ -287,10 +451,28 @@ function renderModuleStudyCards(category) {
           </div>
           <div class="study-sec-content">${cardData.mistakes}</div>
         </div>
-        
+
+        <!-- Hands-On Challenge Section -->
+        <div class="study-sec hands-on-sec" style="margin-bottom: 1.5rem; background: rgba(0, 210, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.15);">
+          <div class="study-sec-title" style="color: var(--neon-blue);">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right:4px; vertical-align:middle;"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.11-.9-2-2-2H4c-1.11 0-2 .89-2 2v10c0 1.1.89 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg>
+            Hands-on Practice Challenge 💻
+          </div>
+          <div class="study-sec-content" style="margin-bottom: 10px;"><strong>Task:</strong> ${cardData.handsOn}</div>
+          
+          <div class="code-section" style="margin-top: 0; background: #04070d;">
+            <div class="code-header">
+              <span>SQL Challenge Solution</span>
+              <button class="btn-copy" onclick="copyCodeText(this)">Copy Solution</button>
+            </div>
+            <pre class="code-block"><code>${cardData.handsOnCode}</code></pre>
+          </div>
+        </div>
+
+        <!-- Ideal Code / Explanation Block -->
         <div class="code-section">
           <div class="code-header">
-            <span>SQL Snippet</span>
+            <span>Interview Reference SQL / Explanation Snippet</span>
             <button class="btn-copy" onclick="copyCodeText(this)">Copy SQL</button>
           </div>
           <pre class="code-block"><code>${cardData.codeSnippet}</code></pre>
